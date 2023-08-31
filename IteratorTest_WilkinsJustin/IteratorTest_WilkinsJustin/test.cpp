@@ -1,13 +1,26 @@
 #include "pch.h"
 #include "class.h"
+class NoReferenceConstructor {
+public:
+	NoReferenceConstructor(int value) : value(value){}
+	int getValue() {
+		return value;
+	}
+private:
+		int value;
+};//リストの参照がないコンストラクタ―を用意
 //iteratorの指す要素を取得する
 TEST(GetTheElementPointedToByTheIterator, BehaviorWhenCalledWithNoListReferenceIt) {//リストの参照がない状態で呼び出した際の挙動(Iterator)
-	DoublyLinkedList::Iterator it = nullptr;
-	ASSERT_DEATH(*it,".*");
+	DoublyLinkedList list;
+	NoReferenceConstructor Constructor(1);
+	DoublyLinkedList::Iterator it = list.begin();
+	ASSERT_DEATH(*it, ".*");
 }
 TEST(GetTheElementPointedToByTheIterator, BehaviorWhenCalledWithNoListReferenceConstIt) {//リストの参照がない状態で呼び出した際の挙動(ConstIterator)
-	DoublyLinkedList::ConstIterator constit= nullptr;
-	ASSERT_DEATH(*constit, ".*");
+	DoublyLinkedList list;
+	NoReferenceConstructor Constructor(1);
+	DoublyLinkedList::ConstIterator it = list.begin();
+	ASSERT_DEATH(*it, ".*");
 }
 TEST(GetTheElementPointedToByTheIterator, CheckWhetherAValueCanBeAssignedToAnElementRetrievedFromTheIterator) {//Iteratorから取得した要素に対して、値の代入が行えるかをチェック
 	DoublyLinkedList list;
@@ -73,15 +86,16 @@ TEST(AdvanceIteratorByOneTowardTheEndOfTheList, BehaviorWhenPerformingAPreincrem
 	auto adit = ++it;
 	EXPECT_EQ(1, (*adit).score);
 }
-//TEST(AdvanceIteratorByOneTowardTheEndOfTheList, ) {//後置インクリメントを行った際の挙動(++演算子オーバーロード)
-//	DoublyLinkedList list;
-//	list.insert(list.begin(), 1, "a");
-//	list.insert(list.begin(), 2, "b");
-//	auto it = list.begin();
-//	EXPECT_EQ(2, (*it).score);
-//	auto adit = it++;
-//	EXPECT_EQ(1, (*adit).score);
-//}
+TEST(AdvanceIteratorByOneTowardTheEndOfTheList, BehaviorWhenPerformingABackincrement) {//後置インクリメントを行った際の挙動(++演算子オーバーロード)
+	DoublyLinkedList list;
+	list.insert(list.begin(), 1, "a");
+	list.insert(list.begin(), 2, "b");
+	auto it = list.begin();
+	EXPECT_EQ(2, (*it).score);
+	it = list.begin();
+	auto adit = it++;
+	EXPECT_EQ(1, (*adit).score);
+}
 //後置インクリメント演算子をオーバーロードすることが出来なかったため、スキップ
 
 //iteratorをリストの先頭に向かって一つ進める
@@ -120,8 +134,15 @@ TEST(AdvanceIteratorByOneTowardTheTopOfTheList, BehaviorWhenPerformingAPreincrem
 	auto adit = --it;
 	EXPECT_EQ(1, (*adit).score);
 }
-TEST(AdvanceIteratorByOneTowardTheTopOfTheList, BehaviorWhenPostfixIncrementIsPerformed) {//後置デクリメントを行った際の挙動(--演算子オーバーロード)
-	//後置では、演算子オーバーロードはできないためスキップ
+TEST(AdvanceIteratorByOneTowardTheTopOfTheList, BehaviorWhenPostfixIncrementIsPerformed) {//後置デクリメントを行った際の挙動(--演算子オーバーロード
+	DoublyLinkedList list;
+	list.insert(list.begin(), 1, "a");
+	list.insert(list.begin(), 2, "b");
+	auto it = list.begin();
+	EXPECT_EQ(2, (*it).score);
+	it = list.begin();
+	auto adit = it--;
+	EXPECT_EQ(1, (*adit).score);
 }
 //iteratorのコピーを行う
 TEST(MakeACopyOfIterator, CheckThatTheValueAfterCopyConstructIsEqualToTheSource) {//コピーコンストラクト後の値がコピー元と等しいことをチェック

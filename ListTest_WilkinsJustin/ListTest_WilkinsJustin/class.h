@@ -1,6 +1,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include <cassert>
 using namespace std;
 struct Data {
     int score; //スコア
@@ -9,7 +10,6 @@ struct Data {
     Data(int score, const string& username) : score(score), username(username) {}//スコアとユーザー名のコンストラクタ
 };
 class DoublyLinkedList {
-    //public:
 private:
     struct Node {
         Node* prev; //前のノードへのポインタ
@@ -19,39 +19,65 @@ private:
         Node(int score, const string& username) : prev(nullptr), next(nullptr), data(score, username) {}//ノード構造体のコンストラクタ
     };
     Node* head;//ノードへのポインタ
-    //Node* tail;//ノードへのポインタ
     size_t size;//データ数の取得
 public:
-    Node* getHead()const {
+
+
+    const Node* getHead()const {
         return head;
     }
-    //Node* getTail()const {
-    //    return tail;
-    //}
     size_t getSize() const {
         return size;
     }
-    DoublyLinkedList() : head(nullptr),/* tail(nullptr)*/ size(0) {}//DoublyLinkedListのコンストラクタ
+    DoublyLinkedList():size(0){//サイズが0の時
+        head=new Node(-1,"");//番兵ノード
+        head->prev=head->next=head; //自己参照
+    }
+    ~DoublyLinkedList(){
+        while (size > 0) {
+            remove(begin());
+        }
+    }
+    //DoublyLinkedList() : head(nullptr),/* tail(nullptr)*/ size(0) {}//DoublyLinkedListのコンストラクタ
     class ConstIterator {
+    //private:
     public:
+        int n;
+        ConstIterator(int n=0):n(n){}
         Node* current;//現在のノード
         ConstIterator(Node* node) : current(node) {} //currentのコンストラクタ
         const Data& operator*() const {
+            //assert(current != nullptr);
             return current->data;//イテレータの指す要素の取得
         }
 
         ConstIterator& operator++() {
+            //assert(current != nullptr);
             if (current) {
                 current = current->next;//リストの末尾に一つ進める
             }
             return *this;
         }
-
+        ConstIterator operator++(int){
+            ConstIterator t = *this;
+            if (current) {
+                current = current->next;//リストの末尾に一つ進める
+            }
+            return t;
+        }
         ConstIterator& operator--() {
+            //assert(current != nullptr);
             if (current) {
                 current = current->prev;//リストの先頭に一つ進める
             }
             return *this;
+        }
+        ConstIterator operator--(int){
+            ConstIterator t = *this;
+            if (current) {
+                current = current->prev;//リストの末尾に一つ進める
+            }
+            return t;
         }
         ConstIterator& operator=(const ConstIterator& other) {
             if (this != &other) {
@@ -67,8 +93,7 @@ public:
         bool operator!=(const ConstIterator& other) const {
             return current != other.current;//異なるか比較
         }
-
-
+        friend class DoublyLinkedList;
     };
     ConstIterator begin() const {
         return ConstIterator(head);//コンストイテレータの先頭を返す
@@ -83,21 +108,17 @@ public:
         Iterator(Node* node) :ConstIterator(node), current(node) {
             current = node;//currentにnodeを代入
         }
-        Iterator(const ConstIterator& other) : ConstIterator(other), current(other.current) {}
+
         Data& operator*() {
             return current->data;//非const版の取得
         }
         operator ConstIterator() const {
             return ConstIterator(current);
         }
+
+        friend class DoublyLinkedList;
     };
     Iterator begin() {
-        //Node* dummyNode = new Node(-1, ""); // ダミーノードの作成
-        //dummyNode->next = dummyNode->prev = dummyNode;
-
-        //if (head == nullptr) {
-        //    return Iterator(dummyNode);
-        //}
         return Iterator(head);//イテレータの先頭を返す
     }
 

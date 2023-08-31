@@ -42,27 +42,42 @@ public:
     class ConstIterator {
     //private:
     public:
+        int n;
+        ConstIterator(int n=0):n(n){}
         Node* current;//現在のノード
         ConstIterator(Node* node) : current(node) {} //currentのコンストラクタ
         const Data& operator*() const {
-            assert(current != nullptr);
+            //assert(current != nullptr);
             return current->data;//イテレータの指す要素の取得
         }
 
         ConstIterator& operator++() {
-            assert(current != nullptr);
+            //assert(current != nullptr);
             if (current) {
                 current = current->next;//リストの末尾に一つ進める
             }
             return *this;
         }
-
+        ConstIterator operator++(int){
+            ConstIterator t = *this;
+            if (current) {
+                current = current->next;//リストの末尾に一つ進める
+            }
+            return t;
+        }
         ConstIterator& operator--() {
-            assert(current != nullptr);
+            //assert(current != nullptr);
             if (current) {
                 current = current->prev;//リストの先頭に一つ進める
             }
             return *this;
+        }
+        ConstIterator operator--(int){
+            ConstIterator t = *this;
+            if (current) {
+                current = current->prev;//リストの末尾に一つ進める
+            }
+            return t;
         }
         ConstIterator& operator=(const ConstIterator& other) {
             if (this != &other) {
@@ -100,6 +115,7 @@ public:
         operator ConstIterator() const {
             return ConstIterator(current);
         }
+
         friend class DoublyLinkedList;
     };
     Iterator begin() {
