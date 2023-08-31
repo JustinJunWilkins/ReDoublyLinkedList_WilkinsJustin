@@ -21,15 +21,27 @@ private:
     Node* head;//ノードへのポインタ
     size_t size;//データ数の取得
 public:
-    Node* getHead()const {
+
+
+    const Node* getHead()const {
         return head;
     }
     size_t getSize() const {
         return size;
     }
-    DoublyLinkedList() : head(nullptr),/* tail(nullptr)*/ size(0) {}//DoublyLinkedListのコンストラクタ
+    DoublyLinkedList():size(0){//サイズが0の時
+        head=new Node(-1,"");//番兵ノード
+        head->prev=head->next=head; //自己参照
+    }
+    ~DoublyLinkedList(){
+        while (size > 0) {
+            remove(begin());
+        }
+    }
+    //DoublyLinkedList() : head(nullptr),/* tail(nullptr)*/ size(0) {}//DoublyLinkedListのコンストラクタ
     class ConstIterator {
-    private:
+    //private:
+    public:
         Node* current;//現在のノード
         ConstIterator(Node* node) : current(node) {} //currentのコンストラクタ
         const Data& operator*() const {
@@ -76,7 +88,7 @@ public:
         return ConstIterator(head);//コンストイテレータの末尾を返す 
     }
     class Iterator :public ConstIterator {
-    private:
+    public:
         Node* current;
         Iterator(Node* node) :ConstIterator(node), current(node) {
             current = node;//currentにnodeを代入
